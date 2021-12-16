@@ -9,9 +9,9 @@ struct student
 int main()
 { 
   int size;
- cout<<"Please enter number of students in course: ";
- cin>>size;
-student* arr = new student[size] ;
+  cout<<"Please enter number of students in course: ";
+  cin>>size;
+  student* arr = new student[size] ;
   for(int i = 0; i < size; i++)
   {
     string f = "";
