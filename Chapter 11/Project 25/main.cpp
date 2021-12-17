@@ -1,181 +1,133 @@
-#include<vector>
-#include<iostream>
-#include<string>
+//This program lists all valid word sequences that spell the number on a phone pad.
+
+#include <string>
+#include <iostream>
 #include <fstream>
+#include <vector>
+#include <ctype.h>
+#include <algorithm>
 using namespace std;
 
-class Solution {
-  private:
-  vector<string> combos;
-public:
-Solution(){}
-Solution(vector<string> c)
+vector <string> dictionary;
+ 
+vector<string> uploadDictionary(string infile)
 {
-combos = c;
+  ifstream scan ( infile);
+  if (!scan) return dictionary;
+  string word;
+  while (scan >> word) {
+        for (char &c : word) c = toupper(c);  
+        dictionary.push_back(word);
+     }
+  return dictionary;
 }
-    void myLetterCombination(string digits, vector<string> &res, string nums[], int i, string s){
-        if(i == digits.length()){
-            combos.push_back(s);
-            return;
-        }
-        string val = nums[digits[i] - '0'];
-        for(int j=0;j<val.length(); j++)
-            myLetterCombination(digits, res, nums, i+1, s+val[j]);
-    } 
-    vector<string> letterCombinations(string digits) {
-        if(digits.length() == 0)
-            return combos;
-        string nums[10] = {
-            "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"
-        };
-        myLetterCombination(digits, combos, nums, 0, "");
-        return combos;
-    }
-};
-
-int main()
+ 
+bool vowel(string str)
 {
-Solution a;
-string phone_number = "9295492865";
-vector<string> b = a.letterCombinations(phone_number);
-cout<<"These are the letter combinations of the number 9295492865: "<<endl<<endl;
-vector<string> words;
-ifstream file;
-file.open("words.txt");
-string word;
-while(file>>word)
-{
-    words.push_back(word);
+  return str == "A" || str == "I" || str == "O";
 }
-for(int i = 0; i < b.size(); i++)
+ 
+bool contains (const vector<string> &d, string word)
 {
-  for(int j = 0; j < words.size(); j++)
+  vector<string>::const_iterator it;
+  for (it = d.begin(); it != d.end() && *it != word;  it++);
+  return it != d.end();
+}
+ostream & operator<< (ostream & os, const vector<string>& words) 
+{
+  cout << "[";
+  if ( words.size() > 0) 
+  {
+    cout << words[0] ;
+    for (int i = 1; i < words.size(); i++)
     {
-  if(b[i].substr(0,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(4,2).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(6,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<endl;
-  }
-  if(b[i].substr(0,3).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(3,3).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(6,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<endl;
-  }
-  if(b[i].substr(0,2).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(2,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(6,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<endl;
-  }
-  //textfile is so big that when trying to check valid word combos by reading through the entire vector of strings consisting of words from words.txt to check if a substring of the number matches with a valid word from the vector the program doesn't show any output.
-#include<vector>
-#include<iostream>
-#include<string>
-#include <fstream>
-using namespace std;
-class Solution {
-  private:
-  vector<string> combos;
-public:
-Solution(){}
-Solution(vector<string> c)
-{
-combos = c;
-}
-    void myLetterCombination(string digits, vector<string> &res, string nums[], int i, string s){
-        if(i == digits.length()){
-            combos.push_back(s);
-            return;
-        }
-        string val = nums[digits[i] - '0'];
-        for(int j=0;j<val.length(); j++)
-            myLetterCombination(digits, res, nums, i+1, s+val[j]);
-    } 
-    vector<string> letterCombinations(string digits) {
-        if(digits.length() == 0)
-            return combos;
-        string nums[10] = {
-            "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"
-        };
-        myLetterCombination(digits, combos, nums, 0, "");
-        return combos;
+        cout << ", " << words[i] ;
     }
-};
-int main()
-{
-Solution a;
-string phone_number = "9295492865";
-vector<string> b = a.letterCombinations(phone_number);
-cout<<"These are the letter combinations of the number 9295492865: "<<endl<<endl;
-vector<string> words;
-ifstream file;
-file.open("words.txt");
-string word;
-while(file>>word)
-{
-    words.push_back(word);
+  }
+  cout << "]";
+  return os;
 }
-for(int i = 0; i < b.size(); i++)
+
+void print_words(string pin, vector<string> words)
 {
-  for(int j = 0; j < words.size(); j++)
+  if (pin.length() == 0)
+  {
+    bool multiword = true;
+    for (int j = 0; j < words.size() && multiword; j++)
     {
-      //makes a phrase consisting of of a four letter word followed by a two letter word followed by a four letter word
-  if(b[i].substr(0,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
+      string word = words[j];
+      if (! contains(dictionary, word))
+      {
+        multiword = false;
+      }
+      if (word.length() == 1 && !vowel(word))
+      {
+        multiword = false;
+      }
+     }
+    if (multiword)
+    {
+      cout << words[0];
+      for (int j = 1; j < words.size(); j++)
+      {
+        cout << " " << words[j];
+      }
+      cout << endl;
+     }
   }
-  if(b[i].substr(4,2).compare(words[j])==0)
+  else
   {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(6,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<endl;
-  }
-  //makes a phrase consisting of a three letter word followed by a three letter word followed by a four letter word
-  if(b[i].substr(0,3).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(3,3).compare(words[j])==0)
-  {
-    cout<<words[j]<<" ";
-  }
-  if(b[i].substr(6,4).compare(words[j])==0)
-  {
-    cout<<words[j]<<endl;
-  }
-  //makes one word
-  if(b[i].compare(words[j])==0)
-  {
-    cout<<words[j]<<endl;
+    if (! words.empty() && contains(dictionary, words.back()) && (  words.back().length() > 1 || vowel(words.back())))
+    {
+      vector<string> wordCopy = words;
+      wordCopy.push_back("");
+      print_words(pin, wordCopy);
+    }
+    string map[] = {"0", "1", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ"};
+     char currentDigit = pin[0];
+     if (isdigit(currentDigit)) 
+     {
+      string letters = map[currentDigit - '0'];
+      int i;
+      for (i = 0; i < letters.size(); i++)
+      {
+        vector<string> wordCopy = words;
+        if (wordCopy.empty())
+        {
+          wordCopy.push_back("");
+        }
+        string word = wordCopy.back() +letters[i];
+        wordCopy.pop_back();
+        wordCopy.push_back(word);
+        print_words(pin.substr(1), wordCopy);
+        }
+     }
+     else
+     {
+      vector<string> wordCopy = words;
+      if (wordCopy.empty())
+      {
+        wordCopy.push_back("");
+      }
+      print_words(pin.substr(1), wordCopy);
+     }
   }
 }
+ 
+void print_words(string n)
+{
+  vector <string> words;
+  print_words(n, words );
 }
-return 0;
+ 
+int main ()
+{
+  uploadDictionary("words.txt");
+  cout << "Enter a phone number: ";
+  string num;
+  cin >> num;
+  cout<<endl;
+  cout << "The valid keypad encodings for " << num << " are" << endl<<endl;
+  print_words(num);
 }
-
-
-
-
 
